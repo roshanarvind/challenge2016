@@ -22,15 +22,20 @@ def read_file():
 
 def main():
 	cities_list = read_file()
-	countries=Set([])
-	provinces=Set([])
-	cities=Set([])
+	countries={}
+	provinces={}
+	cities={}
+	a,b,c = 0,0,0
 	for row in cities_list:
-		countries.add(row[5])
-		provinces.add(row[4])
-		cities.add(row[3])
-	print len(cities), len(provinces), len(countries)
-	print countries
-
+		if row[5] not in countries:
+			a+=1
+			countries[row[5]]=a
+		if row[4] not in provinces:
+			b+=1
+			provinces[row[4]]=b
+		if row[3] not in cities:
+			c+=1	
+			cities[row[3]]=c
+	
 if __name__ == '__main__':
 	main()
