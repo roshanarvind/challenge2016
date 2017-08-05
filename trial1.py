@@ -12,14 +12,14 @@ cities={}
 class distributor:
 	"""docstring for distributor"""
 	dist_total = 1
-	def __init__(self,co_list,ci_list,pr_list):
+	def __init__(self,co_list_i,ci_list_i,pr_list_i,co_list_e,ci_list_e,pr_list_e):
 		self.distributor_id = counter()
-		self.i_countries = co_list
-		self.i_provinces = pr_list
-		self.i_cities = ci_list
-		self.e_countries = []
-		self.e_provinces = []
-		self.e_cities = []
+		self.i_countries = co_list_i
+		self.i_provinces = pr_list_i
+		self.i_cities = ci_list_i
+		self.e_countries = co_list_e
+		self.e_provinces = pr_list_e
+		self.e_cities = ci_list_e
 
 	def add_parent_link(self, parent_id):
 		#self.i_countries.append()
@@ -43,18 +43,30 @@ def add_distributor():
 		parent_id = int(raw_input('Enter Parent ID : '))
 	else:
 		parent_id = -1
-	co_list = []
-	ci_list = []
-	pr_list = []
+	co_list_i = []
+	ci_list_i = []
+	pr_list_i = []
+	co_list_e = []
+	ci_list_e = []
+	pr_list_e = []
+
 	n_cities,n_provinces,n_countries = map(int, raw_input('Enter number of cities, provinces and countries you want to include : ').split(','))
 	for i in xrange(n_cities):
-		ci_list.append(search(raw_input(),1))
+		ci_list_i.append(search(raw_input(),1))
 	for i in xrange(n_provinces):
-		pr_list.append(search(raw_input(),2))
+		pr_list_i.append(search(raw_input(),2))
 	for i in xrange(n_countries):
-		co_list.append(search(raw_input(),3))
+		co_list_i.append(search(raw_input(),3))
 
-	distributor_list.append(distributor(co_list,ci_list,pr_list))
+	n_cities,n_provinces,n_countries = map(int, raw_input('Enter number of cities, provinces and countries you want to exclude : ').split(','))
+	for i in xrange(n_cities):
+		ci_list_e.append(search(raw_input(),1))
+	for i in xrange(n_provinces):
+		pr_list_e.append(search(raw_input(),2))
+	for i in xrange(n_countries):
+		co_list_e.append(search(raw_input(),3))
+
+	distributor_list.append(distributor(co_list,ci_list,pr_list,co_list_e,ci_list_e,pr_list_e))
 
 def show_distributor():
 	for i in distributor_list:
