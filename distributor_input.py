@@ -21,24 +21,30 @@ def read_file():
 
 def get_code(location):
 	location_split = location.split('-')
-	merged_location = ''
-	for item in location_split:
-		merged_location+=item
-	for place in location_list:
-		merge_place = place[1]+place[2]+place[3]
-		if merge_place == merged_location:
-			return place[0]
-	return -1
+	code_list=[]
+	if len(location_split)==3:
+		for place in location_list:
+			if place[1] == location_split[0] and place[2] == location_split[1] and place[3] == location_split[2]:
+				code_list.append(place[0])
 
+	elif len(location_split)==2:
+		for place in location_list:
+			if place[2] == location_split[0] and place[3] == location_split[1]:
+				code_list.append(place[0])
+
+	elif len(location_split)==1:
+		for place in location_list:
+			if place[3] == location_split[0]:
+				code_list.append(place[0])
+	return code_list
 
 def add_distributor(command):
 	distributor = {}
 	if command[1] == 'DISTRIBUTOR':
 		if command[2]:
-			distributor['INCLUDE'] = []
-			distributor['EXCLUDE'] = []
 			distributor['NAME'] = command[2]
-
+			distributor['EXCLUDE'] = []
+			distributor['INCLUDE'] = []
 			while True:
 				input_string2 = raw_input()
 				if input_string2 == '':
@@ -47,23 +53,20 @@ def add_distributor(command):
 				else:
 					command_variables = input_string2.split(' ')
 					if command_variables[0] == 'INCLUDE':
-						distributor['INCLUDE'].append(get_code(command_variables[1]))
+						distributor['INCLUDE'] = get_code(command_variables[1])
 					elif command_variables[0] == 'EXCLUDE':
-						distributor['EXCLUDE'].append(get_code(command_variables[1]))
+						distributor['EXCLUDE'] = get_code(command_variables[1])
+						for item in distributor['EXCLUDE']:
+							distributor['INCLUDE'].remove(item)
 
 		else:
 			print "Please Enter distributor name"
 
-def merge_string(list_val):
-	merged_location = ''
-	for item in list_val:
-		merged_location+=item
-	return merged_location
+
 def check(distributor, location):
-	location_code = get_code(location)
-	included_locations = distributor['INCLUDE']
-	for code in included_locations:
-		if code == location_code:
+	location_code = set(get_code(location))
+	included_locations = set(distributor['INCLUDE'])
+	if location_code.issubset(included_locations):
 			print "Yes, It is included!"
 			return True
 	print "No, It is not included!"
