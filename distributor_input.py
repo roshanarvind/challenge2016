@@ -2,6 +2,7 @@ import csv
 
 distributor_list = []
 location_list = []
+file = open("distributor_list.txt", 'a')
 
 def print_help():
 	print "\t\t***Real Image Challenge 2016***"
@@ -47,34 +48,41 @@ def get_code(location):
 				code_list.append(place[0])
 	return code_list
 
-def add_distributor(command):
+def add_distributor(name, subdist=False, sublist=[], excludelist=[]):
 	distributor = {}
-	if len(command)<3:
-		print "Syntax Error! Type HELP to view syntax"
-		return
-	if command[1] == 'DISTRIBUTOR':
-		if command[2]:
-			distributor['NAME'] = command[2]
-			distributor['EXCLUDE'] = []
-			distributor['INCLUDE'] = []
-			distributor['SUBDISTRIBUTOR'] = False
-			distributor['SUBLIST'] = []
-			while True:
-				input_string2 = raw_input()
-				if input_string2 == '':
-					distributor_list.append(distributor)
-					break
-				else:
-					command_variables = input_string2.split(' ')
-					if command_variables[0] == 'INCLUDE':
-						distributor['INCLUDE'] = get_code(command_variables[1])
-					elif command_variables[0] == 'EXCLUDE':
-						distributor['EXCLUDE'] = get_code(command_variables[1])
-						for item in distributor['EXCLUDE']:
-							distributor['INCLUDE'].remove(item)
-
+	distributor['NAME'] = name
+	distributor['EXCLUDE'] = []
+	distributor['INCLUDE'] = []
+	distributor['SUBDISTRIBUTOR'] = False
+	distributor['SUBLIST'] = []
+	while True:
+		input_string2 = raw_input()
+		if input_string2 == '':
+			distributor_list.append(distributor)
+			break
 		else:
-			print "Please Enter distributor name"
+			command_variables = input_string2.split(' ')
+
+			if command_variables[0] == 'INCLUDE':
+
+				val = get_code(command_variables[1])
+				if subdist:
+					if set(val).issubset(set(sublist)) and not set(val).issubset(set(excludelist)):
+						print "Allowed!"
+						for num in val:
+							distributor['INCLUDE'].append(num)
+					else:
+						print "Not Allowed!"
+				else:
+					for num in val:
+						distributor["INCLUDE"].append(num)
+			elif command_variables[0] == 'EXCLUDE':
+				val = get_code(command_variables[1])
+				for num in val:
+					distributor['EXCLUDE'].append(num)
+				for item in distributor['EXCLUDE']:
+					if item in distributor['INCLUDE']:
+						distributor['INCLUDE'].remove(item)
 
 def add_subdistributor(command):
 	if len(command)<3:
@@ -85,14 +93,13 @@ def add_subdistributor(command):
 
 	for distributor in distributor_list:
 		if distributor['NAME'] == parent:
-			print "Distributor Exists"
+
 			distributor_exists=True
-			break
+			add_distributor(child,True, distributor['INCLUDE'], distributor['EXCLUDE'])
 	if not distributor_exists:
 		print "No Distributor Found!"
 		return
 	
-
 def check(distributor, location):
 	location_code = set(get_code(location))
 	included_locations = set(distributor['INCLUDE'])
@@ -108,14 +115,21 @@ def check_rights(command):
 	for distributor in distributor_list:
 		if distributor['NAME'] == distributor_name:
 			return check(distributor, location_to_check)
+
 def main():
 	read_file()
 	while True:
 		input_string = raw_input("\nEnter Command : ")
 		command = input_string.split(' ')
 		if command[0] == 'ADD':
-			add_distributor(command)
+			if len(command) < 3:
+				print "Syntax Error"
+			else:
+				add_distributor(command[2])
 		elif command[0] == 'EXIT':
+			for distributor in distributor_list:
+				file.write(str(distributor))
+				file.write("\n")
 			exit()
 		elif command[0] == 'SHOW':
 			if len(command)>1:
@@ -130,9 +144,6 @@ def main():
 			print_help()
 		elif command[0] == 'SUBDISTRIBUTE':
 			add_subdistributor(command)
-
-
-
 
 
 if __name__ == '__main__':
