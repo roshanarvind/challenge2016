@@ -2,6 +2,16 @@ import csv
 
 distributor_list = []
 location_list = []
+
+def print_help():
+	print "\t\t***Real Image Challenge 2016***"
+	print " Features : "
+	print " 1. Add a distributor and required permissions"
+	print " 2. Show distributor permissions"
+	print " 3. Check distributor permission for a location"
+	print " SYNTAX"
+	print " ADD DISTRIBUTOR DISTRIUBTOR_NAME"
+
 def show_distributor_details(distributor):
 	print distributor['NAME']
 	print 'INCLUDE : '
@@ -17,7 +27,6 @@ def read_file():
 		each_item = [count, item[0], item[1], item[2]]
 		location_list.append(each_item)
 		count+=1
-	print location_list[0:2]
 
 def get_code(location):
 	location_split = location.split('-')
@@ -40,11 +49,16 @@ def get_code(location):
 
 def add_distributor(command):
 	distributor = {}
+	if len(command)<3:
+		print "Syntax Error! Type HELP to view syntax"
+		return
 	if command[1] == 'DISTRIBUTOR':
 		if command[2]:
 			distributor['NAME'] = command[2]
 			distributor['EXCLUDE'] = []
 			distributor['INCLUDE'] = []
+			distributor['SUBDISTRIBUTOR'] = False
+			distributor['SUBLIST'] = []
 			while True:
 				input_string2 = raw_input()
 				if input_string2 == '':
@@ -62,6 +76,22 @@ def add_distributor(command):
 		else:
 			print "Please Enter distributor name"
 
+def add_subdistributor(command):
+	if len(command)<3:
+		print "Syntax Error"
+		return
+	child = command[1]
+	parent = command[2]
+
+	for distributor in distributor_list:
+		if distributor['NAME'] == parent:
+			print "Distributor Exists"
+			distributor_exists=True
+			break
+	if not distributor_exists:
+		print "No Distributor Found!"
+		return
+	
 
 def check(distributor, location):
 	location_code = set(get_code(location))
@@ -96,7 +126,10 @@ def main():
 				print distributor_list
 		elif command[0] == 'CHECK':
 			check_rights(command)
-		
+		elif command[0] == 'HELP':
+			print_help()
+		elif command[0] == 'SUBDISTRIBUTE':
+			add_subdistributor(command)
 
 
 
